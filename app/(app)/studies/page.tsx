@@ -7,6 +7,7 @@ import { StudyStatusBadge } from "@/components/ui/StatusPill";
 import { listStudies, listCompanies } from "@/lib/data";
 import { formatDate } from "@/lib/utils/format";
 import type { Study } from "@/lib/types";
+import Link from "next/link";
 import { Plus, Filter } from "lucide-react";
 
 export default async function StudiesPage() {
@@ -74,12 +75,12 @@ export default async function StudiesPage() {
             >
               <Filter className="h-3.5 w-3.5" /> Filtrar
             </button>
-            <button
-              type="button"
+            <Link
+              href="/studies/new"
               className="inline-flex items-center gap-1.5 rounded bg-accent px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-accent/90 focus-ring"
             >
               <Plus className="h-3.5 w-3.5" /> Nuevo estudio
-            </button>
+            </Link>
           </>
         }
       />

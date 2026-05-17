@@ -4,8 +4,6 @@
 
 import { companies as seedCompanies } from "@/lib/seed/companies";
 import {
-  studies as seedStudies,
-  studyAreas as seedStudyAreas,
   roadmapItems as seedRoadmap,
   documents as seedDocuments,
 } from "@/lib/seed/studies";
@@ -13,6 +11,15 @@ import {
   listFindings as listFindingsFromStore,
   getFinding as getFindingFromStore,
 } from "@/lib/data/findings-store";
+import {
+  listStudies as listStudiesFromStore,
+  getStudy as getStudyFromStore,
+  getStudyAreas as getStudyAreasFromStore,
+  countActiveStudies,
+  averageMaturity,
+  countCompletedAreas,
+  countTotalAreas,
+} from "@/lib/data/studies-store";
 import { mdmDomains, mdmCatalogs } from "@/lib/seed/master-data";
 import { listItems as listStoreItems, getItem as getStoreItem } from "@/lib/data/mdm-store";
 import {
@@ -68,15 +75,15 @@ export async function getCompany(id: string): Promise<Company | null> {
 }
 
 export async function listStudies(): Promise<Study[]> {
-  return seedStudies;
+  return listStudiesFromStore();
 }
 
 export async function getStudy(id: string): Promise<Study | null> {
-  return seedStudies.find((s) => s.id === id) ?? null;
+  return getStudyFromStore(id);
 }
 
 export async function getStudyAreas(studyId: string): Promise<StudyArea[]> {
-  return seedStudyAreas.filter((a) => a.study_id === studyId);
+  return getStudyAreasFromStore(studyId);
 }
 
 export async function getStudyFindings(studyId: string): Promise<Finding[]> {
@@ -112,23 +119,13 @@ export async function getStudyDocuments(studyId: string): Promise<DocumentRef[]>
 }
 
 export async function getDashboardKpis(): Promise<DashboardKpis> {
-  const studies = await listStudies();
-  const active = studies.filter((s) => s.status === "in_progress" || s.status === "review").length;
-  const allAreas = seedStudyAreas;
-  const completed = allAreas.filter((a) => a.status === "completed").length;
-  const reqs = countAllRequirements();
-  const critical = countCriticalRisks(16);
-  const maturity =
-    studies.length > 0
-      ? Math.round(studies.reduce((sum, s) => sum + s.maturity_score, 0) / studies.length)
-      : 0;
   return {
-    activeStudies: active,
-    completedAreas: completed,
-    totalAreas: allAreas.length,
-    identifiedRequirements: reqs,
-    criticalRisks: critical,
-    averageMaturity: maturity,
+    activeStudies: countActiveStudies(),
+    completedAreas: countCompletedAreas(),
+    totalAreas: countTotalAreas(),
+    identifiedRequirements: countAllRequirements(),
+    criticalRisks: countCriticalRisks(16),
+    averageMaturity: averageMaturity(),
   };
 }
 

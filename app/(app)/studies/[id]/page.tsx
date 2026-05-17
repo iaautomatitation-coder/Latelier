@@ -20,7 +20,9 @@ import {
   getStudyRisks,
   getStudyRequirements,
   getStudyRoadmap,
+  listCompanies,
 } from "@/lib/data";
+import { EditStudyButton } from "@/components/studies/EditStudyButton";
 import type { Finding, Requirement, Risk, RoadmapItem } from "@/lib/types";
 import { formatDate } from "@/lib/utils/format";
 import { Building2, CalendarClock, GitBranch, Target } from "lucide-react";
@@ -29,13 +31,14 @@ export default async function StudyDetailPage({ params }: { params: { id: string
   const study = await getStudy(params.id);
   if (!study) notFound();
 
-  const [company, areas, findings, risks, requirements, roadmap] = await Promise.all([
+  const [company, areas, findings, risks, requirements, roadmap, companies] = await Promise.all([
     getCompany(study.company_id),
     getStudyAreas(study.id),
     getStudyFindings(study.id),
     getStudyRisks(study.id),
     getStudyRequirements(study.id),
     getStudyRoadmap(study.id),
+    listCompanies(),
   ]);
 
   const topRisks = [...risks].sort((a, b) => b.criticality - a.criticality).slice(0, 5);
@@ -147,6 +150,7 @@ export default async function StudyDetailPage({ params }: { params: { id: string
         actions={
           <div className="flex items-center gap-2">
             <StudyStatusBadge status={study.status} />
+            <EditStudyButton study={study} companies={companies} />
           </div>
         }
       />

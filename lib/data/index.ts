@@ -10,7 +10,6 @@ import {
   roadmapItems as seedRoadmap,
   documents as seedDocuments,
 } from "@/lib/seed/studies";
-import { risks as seedRisks } from "@/lib/seed/risks";
 import { mdmDomains, mdmCatalogs } from "@/lib/seed/master-data";
 import { listItems as listStoreItems, getItem as getStoreItem } from "@/lib/data/mdm-store";
 import {
@@ -18,6 +17,11 @@ import {
   getRequirement as getReqFromStore,
   countAllRequirements,
 } from "@/lib/data/requirements-store";
+import {
+  listRisks as listRisksFromStore,
+  getRisk as getRiskFromStore,
+  countCriticalRisks,
+} from "@/lib/data/risks-store";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type {
   Company,
@@ -85,7 +89,11 @@ export async function getRequirement(id: string): Promise<Requirement | null> {
 }
 
 export async function getStudyRisks(studyId: string): Promise<Risk[]> {
-  return seedRisks.filter((r) => r.study_id === studyId);
+  return listRisksFromStore(studyId);
+}
+
+export async function getRisk(id: string): Promise<Risk | null> {
+  return getRiskFromStore(id);
 }
 
 export async function getStudyRoadmap(studyId: string): Promise<RoadmapItem[]> {
@@ -102,7 +110,7 @@ export async function getDashboardKpis(): Promise<DashboardKpis> {
   const allAreas = seedStudyAreas;
   const completed = allAreas.filter((a) => a.status === "completed").length;
   const reqs = countAllRequirements();
-  const critical = seedRisks.filter((r) => r.criticality >= 16).length;
+  const critical = countCriticalRisks(16);
   const maturity =
     studies.length > 0
       ? Math.round(studies.reduce((sum, s) => sum + s.maturity_score, 0) / studies.length)

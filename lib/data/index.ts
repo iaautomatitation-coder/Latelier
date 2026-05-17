@@ -12,7 +12,8 @@ import {
 } from "@/lib/seed/studies";
 import { requirements as seedRequirements } from "@/lib/seed/requirements";
 import { risks as seedRisks } from "@/lib/seed/risks";
-import { mdmDomains, mdmCatalogs, mdmItems } from "@/lib/seed/master-data";
+import { mdmDomains, mdmCatalogs } from "@/lib/seed/master-data";
+import { listItems as listStoreItems, getItem as getStoreItem } from "@/lib/data/mdm-store";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type {
   Company,
@@ -124,7 +125,9 @@ export async function getMdmCatalog(code: string): Promise<MdmCatalog | null> {
 }
 
 export async function listMdmItems(catalogCode: string): Promise<MdmItem[]> {
-  return mdmItems
-    .filter((i) => i.catalog_code === catalogCode && i.deleted_at === null)
-    .sort((a, b) => a.sort_order - b.sort_order);
+  return listStoreItems(catalogCode);
+}
+
+export async function getMdmItem(id: string): Promise<MdmItem | null> {
+  return getStoreItem(id);
 }

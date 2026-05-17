@@ -6,10 +6,13 @@ import { companies as seedCompanies } from "@/lib/seed/companies";
 import {
   studies as seedStudies,
   studyAreas as seedStudyAreas,
-  findings as seedFindings,
   roadmapItems as seedRoadmap,
   documents as seedDocuments,
 } from "@/lib/seed/studies";
+import {
+  listFindings as listFindingsFromStore,
+  getFinding as getFindingFromStore,
+} from "@/lib/data/findings-store";
 import { mdmDomains, mdmCatalogs } from "@/lib/seed/master-data";
 import { listItems as listStoreItems, getItem as getStoreItem } from "@/lib/data/mdm-store";
 import {
@@ -77,7 +80,11 @@ export async function getStudyAreas(studyId: string): Promise<StudyArea[]> {
 }
 
 export async function getStudyFindings(studyId: string): Promise<Finding[]> {
-  return seedFindings.filter((f) => f.study_id === studyId);
+  return listFindingsFromStore(studyId);
+}
+
+export async function getFinding(id: string): Promise<Finding | null> {
+  return getFindingFromStore(id);
 }
 
 export async function getStudyRequirements(studyId: string): Promise<Requirement[]> {

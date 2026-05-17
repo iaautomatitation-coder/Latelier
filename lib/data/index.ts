@@ -10,10 +10,14 @@ import {
   roadmapItems as seedRoadmap,
   documents as seedDocuments,
 } from "@/lib/seed/studies";
-import { requirements as seedRequirements } from "@/lib/seed/requirements";
 import { risks as seedRisks } from "@/lib/seed/risks";
 import { mdmDomains, mdmCatalogs } from "@/lib/seed/master-data";
 import { listItems as listStoreItems, getItem as getStoreItem } from "@/lib/data/mdm-store";
+import {
+  listRequirements as listReqsFromStore,
+  getRequirement as getReqFromStore,
+  countAllRequirements,
+} from "@/lib/data/requirements-store";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type {
   Company,
@@ -73,7 +77,11 @@ export async function getStudyFindings(studyId: string): Promise<Finding[]> {
 }
 
 export async function getStudyRequirements(studyId: string): Promise<Requirement[]> {
-  return seedRequirements.filter((r) => r.study_id === studyId);
+  return listReqsFromStore(studyId);
+}
+
+export async function getRequirement(id: string): Promise<Requirement | null> {
+  return getReqFromStore(id);
 }
 
 export async function getStudyRisks(studyId: string): Promise<Risk[]> {
@@ -93,7 +101,7 @@ export async function getDashboardKpis(): Promise<DashboardKpis> {
   const active = studies.filter((s) => s.status === "in_progress" || s.status === "review").length;
   const allAreas = seedStudyAreas;
   const completed = allAreas.filter((a) => a.status === "completed").length;
-  const reqs = seedRequirements.length;
+  const reqs = countAllRequirements();
   const critical = seedRisks.filter((r) => r.criticality >= 16).length;
   const maturity =
     studies.length > 0
